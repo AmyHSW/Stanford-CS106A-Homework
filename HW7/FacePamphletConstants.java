@@ -1,20 +1,9 @@
-/*
- * File: FacePamphletConstants.java
- * --------------------------------
- * This file declares several constants that are shared by the
- * different modules in the FacePamphlet application.  Any class
- * that implements this interface can use these constants.
- */
-
 public interface FacePamphletConstants {
 
-    /** The width of the application window */
     public static final int APPLICATION_WIDTH = 800;
 
-    /** The height of the application window */
     public static final int APPLICATION_HEIGHT = 500;
 
-    /** Number of characters for each of the text input fields */
     public static final int TEXT_FIELD_SIZE = 15;
 
     /** Text to be used to create an "empty" label to put space
@@ -75,5 +64,10 @@ public interface FacePamphletConstants {
      *  in the profile */
     public static final double STATUS_MARGIN = 20;
 
+    public static final String COMMAND_CHANGE_STATUS = "Change Status";
+
+    public static final String COMMAND_CHANGE_PICTURE = "Change Picture";
+
+    public static final String COMMAND_ADD_FRIEND = "Add Friend";
 }
 
