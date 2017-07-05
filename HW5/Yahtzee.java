@@ -238,6 +238,8 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
             display.updateScorecard(LOWER_SCORE, i, score[i - 1][LOWER_SCORE - 1]);
             if (score[i - 1][UPPER_SCORE - 1] >= 63) {
                 score[i - 1][UPPER_BONUS - 1] = UPPER_BONUS_AWARD;
+            } else {
+                score[i - 1][UPPER_BONUS - 1] = 0;
             }
             display.updateScorecard(UPPER_BONUS, i, score[i - 1][UPPER_BONUS - 1]);
             score[i - 1][TOTAL - 1] = score[i - 1][UPPER_SCORE - 1]
