@@ -50,7 +50,7 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
     private void rollDice(int player) {
         firstRoll(player);
         for (int i = 0; i < N_TURNS - 1; i++) {
-            reRoll();
+            if (!reroll()) break;
         }
     }
 
@@ -64,23 +64,26 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
     }
 
     private String firstRollMessage(int player) {
-        return (playerNames[player - 1]
-                + "\'s turn! Click \"Roll Dice\" button to roll the dice.");
+        return playerNames[player - 1]
+               + "\'s turn! Click \"Roll Dice\" button to roll the dice.";
     }
 
-    private void reRoll() {
-        display.printMessage(reRollMessage());
+    private boolean reroll() {
+        display.printMessage(rerollMessage());
         display.waitForPlayerToSelectDice();
+        boolean isRerolled = false;
         for (int i = 0; i < dice.length; i++) {
             if (display.isDieSelected(i)) {
                 dice[i] = rgen.nextInt(1, MAX_DOTS);
+                isRerolled = true;
             }
         }
         display.displayDice(dice);
+        return isRerolled;
     }
 
-    private String reRollMessage() {
-        return ("Select the dice you wish to re-roll and click \"Roll Again\".");
+    private String rerollMessage() {
+        return "Select the dice you wish to re-roll and click \"Roll Again\".";
     }
 
     private void getScoreOfRound(int player) {
@@ -270,10 +273,10 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
                 winner = i - 1;
             }
         }
-        return ("Congratulations, "
-                + playerNames[winner]
-                + ", you \' are the winner with a total score of "
-                + max);
+        return "Congratulations, "
+               + playerNames[winner]
+               + ", you \' are the winner with a total score of "
+               + max;
     }
 
     private int nPlayers;
