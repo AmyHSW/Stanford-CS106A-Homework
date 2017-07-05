@@ -12,8 +12,8 @@ public class FacePamphlet extends ConsoleProgram
     }
 
     public void init() {
-        canvas = new FacePamphletCanvas();
-        add(canvas);
+        //canvas = new FacePamphletCanvas();
+        //add(canvas);
         addNorthInteractors();
         addWestInteractors();
         addActionListeners();
@@ -58,7 +58,11 @@ public class FacePamphlet extends ConsoleProgram
         case "Add": addProfile(name); break;
         case "Delete": deleteProfile(name); break;
         case "Lookup": lookupProfile(name); break;
+        case COMMAND_CHANGE_STATUS: changeStatus(statusText.getText()); break;
+        case COMMAND_CHANGE_PICTURE: changePicture(pictureText.getText()); break;
+        case COMMAND_ADD_FRIEND: addFriend(friendText.getText()); break;
         }
+        displayCurrentProfile();
     }
 
     private void addProfile(String name) {
@@ -70,6 +74,7 @@ public class FacePamphlet extends ConsoleProgram
             database.addProfile(newProfile);
             println("Add: new profile: " + newProfile);
         }
+        currentProfile = database.getProfile(name);
     }
 
     private void deleteProfile(String name) {
@@ -77,19 +82,71 @@ public class FacePamphlet extends ConsoleProgram
             println("Delete: " + database.getProfile(name));
             database.deleteProfile(name);
         } else {
-            println("Delete: profile with name (" + name + ") does not exist.");
+            println("Delete: profile with name (" + name + ") does not exist");
         }
+        currentProfile = database.getProfile(name);
     }
 
     private void lookupProfile(String name) {
         if (database.containsProfile(name)) {
             println("Lookup: " + database.getProfile(name));
         } else {
-            println("Lookup: profile with name (" + name + ") does not exist.");
+            println("Lookup: profile with name (" + name + ") does not exist");
+        }
+        currentProfile = database.getProfile(name);
+    }
+
+    private void changeStatus(String status) {
+        if (currentProfile == null) {
+            println("Please select a profile to change status");
+            return;
+        }
+        currentProfile.setStatus(status);
+        println("Status updated to " + status);
+    }
+
+    private void changePicture(String picture) {
+        if (currentProfile == null) {
+            println("Please select a profile to change picture");
+            return;
+        }
+        GImage image = null;
+        try {
+            image = new GImage(picture);
+            currentProfile.setImage(image);
+            println("Picture updated");
+        } catch (ErrorException ex) {
+            println("The picture with name (" + picture + ") does not exit");
+        }
+    }
+
+    private void addFriend(String friend) {
+        if (currentProfile == null) {
+            println("Please select a profile to add friend");
+            return;
+        }
+        if (!database.containsProfile(friend)) {
+            println("Add friend (" + friend + ") failed");
+            return;
+        }
+        if (currentProfile.addFriend(friend)) {
+            database.getProfile(friend).addFriend(currentProfile.getName());
+            println(friend + " added as a friend");
+        } else {
+            println(friend + "is already a friend of " + currentProfile.getName());
+        }
+     }
+
+    private void displayCurrentProfile() {
+        if (currentProfile != null) {
+            println("--> Current Profile: " + currentProfile);
+        } else {
+            println("--> No current profile");
         }
     }
 
     private JTextField nameText, statusText, pictureText, friendText;
     private FacePamphletCanvas canvas;
     private FacePamphletDatabase database;
+    private FacePamphletProfile currentProfile;
 }

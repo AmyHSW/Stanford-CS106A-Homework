@@ -15,6 +15,11 @@ public class FacePamphletDatabase implements FacePamphletConstants {
     }
 
     public void deleteProfile(String name) {
+        Iterator<String> friendList = database.get(name).getFriends();
+        while (friendList.hasNext()) {
+            FacePamphletProfile friend = database.get(friendList.next());
+            friend.removeFriend(name);
+        }
         database.remove(name);
     }
 
