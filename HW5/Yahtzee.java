@@ -64,7 +64,7 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
         display.printMessage(firstRollMessage(player));
         display.waitForPlayerToClickRoll(player);
         for (int iDice = dice.length - 1; iDice >= 0; iDice--) {
-             dice[iDice] = rgen.nextInt(1, MAX_DOTS);
+            dice[iDice] = rgen.nextInt(1, MAX_DOTS);
         }
         display.displayDice(dice);
     }
@@ -266,10 +266,10 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
     private String findWinner() {
         int max = 0;
         int winner = 0;
-        for (int i = 0; i < nPlayers; i++) {
+        for (int i = 1; i <= nPlayers; i++) {
             if (score[i - 1][TOTAL - 1] > max) {
                 max = score[i - 1][TOTAL - 1];
-                winner = i;
+                winner = i - 1;
             }
         }
         return ("Congratulations, "
