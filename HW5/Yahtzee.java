@@ -29,19 +29,16 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
         }
 
         score = new Integer[nPlayers][N_CATEGORIES];
-        display = new YahtzeeDisplay(getGCanvas(), playerNames);
-        roundsLeft = N_SCORING_CATEGORIES;
         dice = new int[N_DICE];
+        display = new YahtzeeDisplay(getGCanvas(), playerNames);
      }
 
     private void playGame() {
-        while (roundsLeft > 0) {
+        for (int n = 0; n < N_SCORING_CATEGORIES; n++) {
             for (int i = 1; i <= nPlayers; i++) {
                 rollDice(i);
                 getScoreOfRound(i);
-                display.updateScorecard(cat, i, score[i - 1][cat - 1]);
             }
-            roundsLeft--;
         }
     }
 
@@ -52,7 +49,6 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 
     private void rollDice(int player) {
         initDice();
-        countValue = new int[MAX_DOTS];
         firstRoll(player);
         int nTurnsLeft = N_TURNS -1;
         while (nTurnsLeft-- > 0) {
@@ -97,15 +93,17 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 
     private void getScoreOfRound(int player) {
         display.printMessage("Select a category for this roll.");
+        int cat = 0;
         while (true) {
             cat = display.waitForPlayerToSelectCategory();
             if (score[player - 1][cat - 1] == null) break;
         }
         if (checkCategory(cat)) {
-            score[player - 1][cat - 1] = estimateScore();
+            score[player - 1][cat - 1] = estimateScore(cat);
         } else {
             score[player - 1][cat - 1] = 0;
         }
+        display.updateScorecard(cat, player, score[player - 1][cat - 1]);
     }
 
     private boolean checkCategory(int cat) {
@@ -125,8 +123,9 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
     }
 
     private boolean isThreeOfAKind() {
+        int[] countValue = new int[MAX_DOTS];
         for (int i = 0; i < dice.length; i++) {
-            evaluate(dice[i]);
+            evaluate(countValue, dice[i]);
         }
         for (int i = 0; i < MAX_DOTS; i++) {
             if (countValue[i] >= 3) return true;
@@ -135,8 +134,9 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
     }
 
     private boolean isFourOfAKind() {
+        int[] countValue = new int[MAX_DOTS];
         for (int i = 0; i < dice.length; i++) {
-            evaluate(dice[i]);
+            evaluate(countValue, dice[i]);
         }
         for (int i = 0; i < MAX_DOTS; i++) {
             if (countValue[i] >= 4) return true;
@@ -146,6 +146,10 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 
     private boolean isFullHouse() {
         if (!isThreeOfAKind()) return false;
+        int[] countValue = new int[MAX_DOTS];
+        for (int i = 0; i < dice.length; i++) {
+            evaluate(countValue, dice[i]);
+        }
         for (int i = 0; i < MAX_DOTS; i++) {
             if (countValue[i] == 1) return false;
         }
@@ -190,20 +194,15 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
         return true;
     }
 
-    private void evaluate(int value) {
-        for (int i = 1; i <= MAX_DOTS; i++) {
-            if (value == i) {
-                countValue[i-1]++;
-                return;
-            }
-        }
+    private void evaluate(int[] countValue, int value) {
+        countValue[value - 1]++;
     }
 
-    private int estimateScore() {
+    private int estimateScore(int cat) {
         switch (cat) {
         case ONES: case TWOS: case THREES:
         case FOURS: case FIVES: case SIXES:
-            return getScoreUpperCategory();
+            return getScoreUpperCategory(cat);
         case THREE_OF_A_KIND: case FOUR_OF_A_KIND: case CHANCE:
             return getSumValues();
         case FULL_HOUSE:
@@ -217,7 +216,7 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
         }
     }
 
-    private int getScoreUpperCategory() {
+    private int getScoreUpperCategory(int cat) {
         int sc = 0;
         for (int iDice = dice.length - 1; iDice >= 0; iDice--) {
             if (dice[iDice] == cat) {
@@ -286,13 +285,10 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
                 + max);
     }
 
-    private int cat;
     private int nPlayers;
-    private int roundsLeft;
-    private int[] dice;
-    private int[] countValue;
-    private Integer[][] score;
     private String[] playerNames;
+    private Integer[][] score;
+    private int[] dice;
     private YahtzeeDisplay display;
     private RandomGenerator rgen = new RandomGenerator();
 }
