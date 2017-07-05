@@ -48,25 +48,17 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
     }
 
     private void rollDice(int player) {
-        initDice();
         firstRoll(player);
-        int nTurnsLeft = N_TURNS -1;
-        while (nTurnsLeft-- > 0) {
+        for (int i = 0; i < N_TURNS - 1; i++) {
             reRoll();
-        }
-    }
-
-    private void initDice() {
-        for (int i = dice.length - 1; i >= 0; i--)  {
-            dice[i] = 0;
         }
     }
 
     private void firstRoll(int player) {
         display.printMessage(firstRollMessage(player));
         display.waitForPlayerToClickRoll(player);
-        for (int iDice = dice.length - 1; iDice >= 0; iDice--) {
-            dice[iDice] = rgen.nextInt(1, MAX_DOTS);
+        for (int i = 0; i < dice.length; i++) {
+            dice[i] = rgen.nextInt(1, MAX_DOTS);
         }
         display.displayDice(dice);
     }
@@ -79,7 +71,7 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
     private void reRoll() {
         display.printMessage(reRollMessage());
         display.waitForPlayerToSelectDice();
-        for (int i = dice.length - 1; i >= 0; i--) {
+        for (int i = 0; i < dice.length; i++) {
             if (display.isDieSelected(i)) {
                 dice[i] = rgen.nextInt(1, MAX_DOTS);
             }
@@ -217,20 +209,19 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
     }
 
     private int getScoreUpperCategory(int cat) {
-        int sc = 0;
-        for (int iDice = dice.length - 1; iDice >= 0; iDice--) {
-            if (dice[iDice] == cat) {
-                sc += cat;
+        int score = 0;
+        for (int i = 0; i < dice.length; i++) {
+            if (dice[i] == cat) {
+                score += cat;
             }
         }
-        return sc;
+        return score;
     }
 
     private int getSumValues() {
         int sum = 0;
-        int iDice = 0;
-        while (iDice < dice.length) {
-            sum += dice[iDice++];
+        for (int i = 0; i < dice.length; i++) {
+            sum += dice[i];
         }
         return sum;
     }
