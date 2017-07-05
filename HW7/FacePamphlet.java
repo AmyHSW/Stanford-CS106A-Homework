@@ -4,7 +4,7 @@ import acm.util.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-public class FacePamphlet extends Program
+public class FacePamphlet extends ConsoleProgram
                     implements FacePamphletConstants {
 
     public static void main(String[] args) {
@@ -17,6 +17,7 @@ public class FacePamphlet extends Program
         addNorthInteractors();
         addWestInteractors();
         addActionListeners();
+        database = new FacePamphletDatabase();
     }
 
     private void addNorthInteractors() {
@@ -52,9 +53,43 @@ public class FacePamphlet extends Program
     }
 
     public void actionPerformed(ActionEvent e) {
+        String name = nameText.getText();
+        switch (e.getActionCommand()) {
+        case "Add": addProfile(name); break;
+        case "Delete": deleteProfile(name); break;
+        case "Lookup": lookupProfile(name); break;
+        }
+    }
 
+    private void addProfile(String name) {
+        if (database.containsProfile(name)) {
+            println("Add: profile for " + name + "alrealy exists: "
+                    + database.getProfile(name));
+        } else {
+            FacePamphletProfile newProfile = new FacePamphletProfile(name);
+            database.addProfile(newProfile);
+            println("Add: new profile: " + newProfile);
+        }
+    }
+
+    private void deleteProfile(String name) {
+        if (database.containsProfile(name)) {
+            println("Delete: " + database.getProfile(name));
+            database.deleteProfile(name);
+        } else {
+            println("Delete: profile with name (" + name + ") does not exist.");
+        }
+    }
+
+    private void lookupProfile(String name) {
+        if (database.containsProfile(name)) {
+            println("Lookup: " + database.getProfile(name));
+        } else {
+            println("Lookup: profile with name (" + name + ") does not exist.");
+        }
     }
 
     private JTextField nameText, statusText, pictureText, friendText;
     private FacePamphletCanvas canvas;
+    private FacePamphletDatabase database;
 }
