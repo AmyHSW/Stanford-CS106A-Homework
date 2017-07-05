@@ -11,21 +11,30 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
     }
 
     public void run() {
+        setupGame();
+        playGame();
+        showResults();
+    }
+
+    private void setupGame() {
         IODialog dialog = getDialog();
         while (true) {
             nPlayers = dialog.readInt("Enter number of players");
             if (nPlayers > 0 && nPlayers <= MAX_PLAYERS) break;
         }
+
         playerNames = new String[nPlayers];
         for (int i = 1; i <= nPlayers; i++) {
             playerNames[i - 1] = dialog.readLine("Enter name for player " + i);
         }
+
+        score = new Integer[nPlayers][N_CATEGORIES];
         display = new YahtzeeDisplay(getGCanvas(), playerNames);
-        playGame();
-    }
+        roundsLeft = N_SCORING_CATEGORIES;
+        dice = new int[N_DICE];
+     }
 
     private void playGame() {
-        initGame();
         while (roundsLeft > 0) {
             for (int i = 1; i <= nPlayers; i++) {
                 rollDice(i);
@@ -34,14 +43,11 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
             }
             roundsLeft--;
         }
-        displayTotalScores();
-        display.printMessage(findWinner());
     }
 
-    private void initGame() {
-        roundsLeft = N_SCORING_CATEGORIES;
-        dice = new int[N_DICE];
-        score = new Integer[nPlayers][N_CATEGORIES];
+    private void showResults() {
+        displayTotalScores();
+        display.printMessage(findWinner());
     }
 
     private void rollDice(int player) {
