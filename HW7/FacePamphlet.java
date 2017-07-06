@@ -4,7 +4,7 @@ import acm.util.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-public class FacePamphlet extends ConsoleProgram
+public class FacePamphlet extends Program
                     implements FacePamphletConstants {
 
     public static void main(String[] args) {
@@ -12,11 +12,13 @@ public class FacePamphlet extends ConsoleProgram
     }
 
     public void init() {
-        //canvas = new FacePamphletCanvas();
-        //add(canvas);
+        canvas = new FacePamphletCanvas();
+        add(canvas);
+
         addNorthInteractors();
         addWestInteractors();
         addActionListeners();
+
         database = new FacePamphletDatabase();
     }
 
@@ -53,7 +55,7 @@ public class FacePamphlet extends ConsoleProgram
     }
 
     public void actionPerformed(ActionEvent e) {
-        String name = nameText.getText();
+        String name = nameText.getText().trim();
         switch (e.getActionCommand()) {
         case "Add": addProfile(name); break;
         case "Delete": deleteProfile(name); break;
@@ -62,88 +64,99 @@ public class FacePamphlet extends ConsoleProgram
         case COMMAND_CHANGE_PICTURE: changePicture(pictureText.getText()); break;
         case COMMAND_ADD_FRIEND: addFriend(friendText.getText()); break;
         }
-        displayCurrentProfile();
     }
 
     private void addProfile(String name) {
+        if (name.length() == 0) return;
         if (database.containsProfile(name)) {
-            println("Add: profile for " + name + "alrealy exists: "
-                    + database.getProfile(name));
+            canvas.showMessage("A profile with the name " + name + " alrealy exists");
         } else {
             FacePamphletProfile newProfile = new FacePamphletProfile(name);
             database.addProfile(newProfile);
-            println("Add: new profile: " + newProfile);
+            canvas.showMessage("New profile created");
         }
         currentProfile = database.getProfile(name);
+        canvas.displayProfile(currentProfile);
     }
 
     private void deleteProfile(String name) {
+        if (name.length() == 0) return;
         if (database.containsProfile(name)) {
-            println("Delete: " + database.getProfile(name));
+            canvas.showMessage("Profile of " + name + " deleted");
             database.deleteProfile(name);
         } else {
-            println("Delete: profile with name (" + name + ") does not exist");
+            canvas.showMessage("A profile with the name " + name + " does not exist");
         }
-        currentProfile = database.getProfile(name);
+        currentProfile = null;
+        canvas.displayProfile(currentProfile);
     }
 
     private void lookupProfile(String name) {
+        if (name.length() == 0) return;
         if (database.containsProfile(name)) {
-            println("Lookup: " + database.getProfile(name));
+            canvas.showMessage("Displaying " + name);
         } else {
-            println("Lookup: profile with name (" + name + ") does not exist");
+            canvas.showMessage("A profile with the name " + name + " does not exist");
         }
         currentProfile = database.getProfile(name);
+        canvas.displayProfile(currentProfile);
     }
 
     private void changeStatus(String status) {
+        status = status.trim();
+        if (status.length() == 0) return;
         if (currentProfile == null) {
-            println("Please select a profile to change status");
+            canvas.showMessage("Please select a profile to change status");
             return;
         }
         currentProfile.setStatus(status);
-        println("Status updated to " + status);
+        canvas.showMessage("Status updated to " + status);
+        canvas.displayProfile(currentProfile);
     }
 
     private void changePicture(String picture) {
+        picture = picture.trim();
+        if (picture.length() == 0) return;
         if (currentProfile == null) {
-            println("Please select a profile to change picture");
+            canvas.showMessage("Please select a profile to change picture");
             return;
         }
         GImage image = null;
         try {
             image = new GImage(picture);
             currentProfile.setImage(image);
-            println("Picture updated");
+            canvas.showMessage("Picture updated");
+            canvas.displayProfile(currentProfile);
         } catch (ErrorException ex) {
-            println("The picture with name (" + picture + ") does not exit");
+            canvas.showMessage("Unable to open image file: " + picture);
         }
     }
 
     private void addFriend(String friend) {
         if (currentProfile == null) {
-            println("Please select a profile to add friend");
+            canvas.showMessage("Please select a profile to add friend");
             return;
         }
+        friend = friend.trim();
+        if (friend.length() == 0) return;
         if (!database.containsProfile(friend)) {
-            println("Add friend (" + friend + ") failed");
+            canvas.showMessage(friend + " does not exist");
+            return;
+        }
+        if (friend.equals(currentProfile.getName())) {
+            canvas.showMessage(friend + " is the name of current profile."
+                               + " Please try another name");
             return;
         }
         if (currentProfile.addFriend(friend)) {
             database.getProfile(friend).addFriend(currentProfile.getName());
-            println(friend + " added as a friend");
+            canvas.showMessage(friend + " added as a friend");
+            canvas.displayProfile(currentProfile);
         } else {
-            println(friend + "is already a friend of " + currentProfile.getName());
+            canvas.showMessage(currentProfile.getName() + " already has "
+                               + friend + " as a friend");
         }
      }
-
-    private void displayCurrentProfile() {
-        if (currentProfile != null) {
-            println("--> Current Profile: " + currentProfile);
-        } else {
-            println("--> No current profile");
-        }
-    }
 
     private JTextField nameText, statusText, pictureText, friendText;
     private FacePamphletCanvas canvas;

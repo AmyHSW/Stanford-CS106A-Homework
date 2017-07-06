@@ -6,6 +6,7 @@ public class FacePamphletProfile implements FacePamphletConstants {
     public FacePamphletProfile(String name) {
         profileName = name;
         profileStatus = "";
+        profileImage = null;
     }
 
     public String getName() {
@@ -29,7 +30,7 @@ public class FacePamphletProfile implements FacePamphletConstants {
     }
 
     public boolean addFriend(String friend) {
-        if (!friendList.contains(friend)) {
+        if (!friendList.contains(friend) && !friend.equals(profileName)) {
             return friendList.add(friend);
         } else {
             return false;
