@@ -16,6 +16,7 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
         showResults();
     }
 
+    /* Step1: setup */
     private void setupGame() {
         IODialog dialog = getDialog();
         while (true) {
@@ -33,7 +34,7 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
         display = new YahtzeeDisplay(getGCanvas(), playerNames);
      }
 
-    private int[][] newMatrix(int row, int col, int value) {
+    private static int[][] newMatrix(int row, int col, int value) {
         int[][] matrix = new int[row][col];
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < col; j++) {
@@ -43,23 +44,19 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
         return matrix;
     }
 
+    /* Step2: play game */
     private void playGame() {
         for (int n = 0; n < N_SCORING_CATEGORIES; n++) {
             for (int i = 1; i <= nPlayers; i++) {
                 rollDice(i);
-                getScoreOfRound(i);
+                fillScorecard(i);
             }
         }
     }
 
-    private void showResults() {
-        displayTotalScores();
-        display.printMessage(findWinner());
-    }
-
     private void rollDice(int player) {
         firstRoll(player);
-        for (int i = 0; i < N_TURNS - 1; i++) {
+        for (int i = 0; i < REROLL_TIMES; i++) {
             if (!reroll()) break;
         }
     }
@@ -96,161 +93,124 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
         return "Select the dice you wish to re-roll and click \"Roll Again\".";
     }
 
-    private void getScoreOfRound(int player) {
+    private void fillScorecard(int player) {
         display.printMessage("Select a category for this roll.");
         int cat = 0;
         while (true) {
             cat = display.waitForPlayerToSelectCategory();
             if (score[cat - 1][player - 1] == NOT_ASSIGNED) break;
         }
-        if (checkCategory(cat)) {
-            score[cat - 1][player - 1] = estimateScore(cat);
+        if (isCategory(cat)) {
+            score[cat - 1][player - 1] = getScore(cat);
         } else {
             score[cat - 1][player - 1] = 0;
         }
         display.updateScorecard(cat, player, score[cat - 1][player - 1]);
     }
 
-    private boolean checkCategory(int cat) {
+    private boolean isCategory(int cat) {
         switch (cat) {
         case ONES: case TWOS: case THREES:
-        case FOURS: case FIVES: case SIXES:
-            return true;
-        case THREE_OF_A_KIND: return isThreeOfAKind();
-        case FOUR_OF_A_KIND: return isFourOfAKind();
+        case FOURS: case FIVES: case SIXES: return true;
+        case THREE_OF_A_KIND: return isNOfAKind(3);
+        case FOUR_OF_A_KIND: return isNOfAKind(4);
         case FULL_HOUSE: return isFullHouse();
-        case SMALL_STRAIGHT: return isSmallStraight();
-        case LARGE_STRAIGHT: return isLargeStraight();
-        case YAHTZEE: return isYahtzee();
+        case SMALL_STRAIGHT: return isStraight(4);
+        case LARGE_STRAIGHT: return isStraight(5);
+        case YAHTZEE: return isNOfAKind(5);
         case CHANCE: return true;
         default: return false;
         }
     }
 
-    private boolean isThreeOfAKind() {
-        int[] countValue = new int[MAX_DOTS];
-        for (int i = 0; i < dice.length; i++) {
-            evaluate(countValue, dice[i]);
-        }
-        for (int i = 0; i < MAX_DOTS; i++) {
-            if (countValue[i] >= 3) return true;
-        }
-        return false;
-    }
-
-    private boolean isFourOfAKind() {
-        int[] countValue = new int[MAX_DOTS];
-        for (int i = 0; i < dice.length; i++) {
-            evaluate(countValue, dice[i]);
-        }
-        for (int i = 0; i < MAX_DOTS; i++) {
-            if (countValue[i] >= 4) return true;
+    private boolean isNOfAKind(int n) {
+        Arrays.sort(dice);
+        int count = 1;
+        for (int i = 1; i < dice.length; i++) {
+            if (dice[i] == dice[i - 1]) {
+                count++;
+            } else {
+                count = 1;
+            }
+            if (count == n) return true;
         }
         return false;
     }
 
     private boolean isFullHouse() {
-        if (!isThreeOfAKind()) return false;
-        int[] countValue = new int[MAX_DOTS];
-        for (int i = 0; i < dice.length; i++) {
-            evaluate(countValue, dice[i]);
-        }
-        for (int i = 0; i < MAX_DOTS; i++) {
-            if (countValue[i] == 1) return false;
-        }
-        return true;
-    }
-
-    private boolean isSmallStraight() {
         Arrays.sort(dice);
-        int prev = -1;
-        int error = 0;
-        for (int i = 0; i < dice.length; i++) {
-            if (prev == -1 || dice[i] == prev + 1) {
-                prev = dice[i];
-            } else {
-                if (++error > 1) return false;
-                if (prev != dice[i]) {
-                    prev = dice[i];
-                }
-            }
-        }
-        return true;
+        return dice[0] == dice[1] && dice[3] == dice[4]
+               && (dice[2] == dice[0] || dice[2] == dice[4]);
     }
 
-    private boolean isLargeStraight() {
+    private boolean isStraight(int n) {
         Arrays.sort(dice);
-        int prev = -1;
-        for (int i = 0; i < dice.length; i++) {
-            if (prev == -1 || dice[i] == prev + 1) {
-                prev = dice[i];
-            } else {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean isYahtzee() {
-        int prev = dice[0];
+        int count = 1;
         for (int i = 1; i < dice.length; i++) {
-            if (dice[i] != prev) return false;
+            if (dice[i] == dice[i - 1] + 1) {
+                count++;
+            } else if (dice[i] != dice[i - 1]) {
+                count = 1;
+            }
+            if (count == n) return true;
         }
-        return true;
+        return false;
     }
 
-    private void evaluate(int[] countValue, int value) {
-        countValue[value - 1]++;
-    }
-
-    private int estimateScore(int cat) {
+    private int getScore(int cat) {
         switch (cat) {
         case ONES: case TWOS: case THREES:
         case FOURS: case FIVES: case SIXES:
-            return getScoreUpperCategory(cat);
+            return sumOfElement(dice, cat);
         case THREE_OF_A_KIND: case FOUR_OF_A_KIND: case CHANCE:
-            return getSumValues();
-        case FULL_HOUSE:
-            return SCORE_FULL_HOUSE;
-        case SMALL_STRAIGHT:
-            return SCORE_SMALL_STRAIGHT;
-        case LARGE_STRAIGHT:
-            return SCORE_LARGE_STRAIGHT;
+            return sum(dice);
+        case FULL_HOUSE: return SCORE_FULL_HOUSE;
+        case SMALL_STRAIGHT: return SCORE_SMALL_STRAIGHT;
+        case LARGE_STRAIGHT: return SCORE_LARGE_STRAIGHT;
         case YAHTZEE: return SCORE_YAHTZEE;
         default: return 0;
         }
     }
 
-    private int getScoreUpperCategory(int cat) {
-        int score = 0;
-        for (int i = 0; i < dice.length; i++) {
-            if (dice[i] == cat) {
-                score += cat;
-            }
-        }
-        return score;
-    }
-
-    private int getSumValues() {
+    private static int sumOfElement(int[] array, int elem) {
         int sum = 0;
-        for (int i = 0; i < dice.length; i++) {
-            sum += dice[i];
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] == elem) {
+                sum += elem;
+            }
         }
         return sum;
     }
 
+    private static int sum(int[] array) {
+        int sum = 0;
+        for (int i = 0; i < array.length; i++) {
+            sum += array[i];
+        }
+        return sum;
+    }
+
+    /* Step3: show results */
+    private void showResults() {
+        displayTotalScores();
+        displayWinnerMessage();
+    }
+
     private void displayTotalScores() {
         for (int i = 1; i <= nPlayers; i++) {
-            score[UPPER_SCORE - 1][i - 1]= findUpperScore(i);
+            score[UPPER_SCORE - 1][i - 1]= sumOfRows(score, ONES - 1, SIXES - 1, i - 1);
             display.updateScorecard(UPPER_SCORE, i, score[UPPER_SCORE - 1][i - 1]);
-            score[LOWER_SCORE - 1][i - 1] = findLowerScore(i);
+
+            score[LOWER_SCORE - 1][i - 1] = sumOfRows(score, THREE_OF_A_KIND - 1, CHANCE - 1, i - 1);
             display.updateScorecard(LOWER_SCORE, i, score[LOWER_SCORE - 1][i - 1]);
+
             if (score[UPPER_SCORE - 1][i - 1] >= 63) {
                 score[UPPER_BONUS - 1][i - 1] = UPPER_BONUS_AWARD;
             } else {
                 score[UPPER_BONUS - 1][i - 1] = 0;
             }
             display.updateScorecard(UPPER_BONUS, i, score[UPPER_BONUS - 1][i - 1]);
+
             score[TOTAL - 1][i - 1] = score[UPPER_SCORE - 1][i - 1]
                                       + score[UPPER_BONUS - 1][i - 1]
                                       + score[LOWER_SCORE - 1][i - 1];
@@ -258,35 +218,34 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
         }
     }
 
-    private int findUpperScore(int player) {
-        int upperScore = 0;
-        for (int c = 0; c < SIXES; c++) {
-            upperScore += score[c][player - 1];
+    private static int sumOfRows(int[][] mat, int rowStart, int rowEnd, int col) {
+        int sum = 0;
+        for (int i = rowStart; i <= rowEnd; i++) {
+            sum += mat[i][col];
         }
-        return upperScore;
+        return sum;
     }
 
-    private int findLowerScore(int player) {
-        int lowerScore = 0;
-        for (int c = THREE_OF_A_KIND - 1; c < CHANCE; c++) {
-            lowerScore += score[c][player - 1];
-        }
-        return lowerScore;
+    private void displayWinnerMessage() {
+        int winner = maxIndex(score[TOTAL - 1]);
+        display.printMessage(winnerMessage(playerNames[winner], score[TOTAL - 1][winner]));
     }
 
-    private String findWinner() {
-        int max = 0;
-        int winner = 0;
-        for (int i = 1; i <= nPlayers; i++) {
-            if (score[TOTAL - 1][i - 1] > max) {
-                max = score[TOTAL - 1][i - 1];
-                winner = i - 1;
+    private static int maxIndex(int[] array) {
+        int maxIndex = 0;
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] > array[maxIndex]) {
+                maxIndex = i;
             }
         }
+        return maxIndex;
+    }
+
+    private String winnerMessage(String name, int score) {
         return "Congratulations, "
-               + playerNames[winner]
+               + name
                + ", you \' are the winner with a total score of "
-               + max;
+               + score;
     }
 
     private int nPlayers;

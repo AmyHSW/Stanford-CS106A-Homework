@@ -12,7 +12,7 @@ public interface YahtzeeConstants {
 
     public static final int N_SCORING_CATEGORIES = 13;
 
-    public static final int N_TURNS = 3;
+    public static final int REROLL_TIMES = 2;
 
     public static final int MAX_DOTS = 6;
 
