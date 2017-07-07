@@ -16,6 +16,8 @@ public interface YahtzeeConstants {
 
     public static final int MAX_DOTS = 6;
 
+    public static final int NOT_ASSIGNED = -1;
+
     public static final int SCORE_FULL_HOUSE = 25;
 
     public static final int SCORE_SMALL_STRAIGHT = 30;
