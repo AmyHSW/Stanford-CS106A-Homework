@@ -24,9 +24,11 @@ public class FacePamphlet extends Program
 
     private void addNorthInteractors() {
         add(new JLabel("Name"), NORTH);
+
         nameText = new JTextField(TEXT_FIELD_SIZE);
         nameText.addActionListener(this);
         add(nameText, NORTH);
+
         add(new JButton("Add"), NORTH);
         add(new JButton("Delete"), NORTH);
         add(new JButton("Lookup"), NORTH);
