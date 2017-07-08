@@ -3,29 +3,31 @@ import java.util.*;
 public class FacePamphletDatabase implements FacePamphletConstants {
 
     public FacePamphletDatabase() {
-        database = new HashMap<String, FacePamphletProfile>();
+        map = new HashMap<String, FacePamphletProfile>();
     }
 
     public void addProfile(FacePamphletProfile profile) {
-        database.put(profile.getName(), profile);
+        map.put(profile.getName(), profile);
     }
 
     public FacePamphletProfile getProfile(String name) {
-        return database.get(name);
+        return map.get(name);
     }
 
-    public void deleteProfile(String name) {
-        Iterator<String> friendList = database.get(name).getFriends();
-        while (friendList.hasNext()) {
-            FacePamphletProfile friend = database.get(friendList.next());
+    public boolean deleteProfile(String name) {
+        if (!map.containsKey(name)) return false;
+        Iterator<String> it = map.get(name).getFriends();
+        while (it.hasNext()) {
+            FacePamphletProfile friend = map.get(it.next());
             friend.removeFriend(name);
         }
-        database.remove(name);
+        map.remove(name);
+        return true;
     }
 
     public boolean containsProfile(String name) {
-        return database.containsKey(name);
+        return map.containsKey(name);
     }
 
-    private Map<String, FacePamphletProfile> database;
+    private Map<String, FacePamphletProfile> map;
 }

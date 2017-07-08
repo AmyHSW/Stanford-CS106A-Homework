@@ -83,9 +83,8 @@ public class FacePamphlet extends Program
 
     private void deleteProfile(String name) {
         if (name.length() == 0) return;
-        if (database.containsProfile(name)) {
+        if (database.deleteProfile(name)) {
             canvas.showMessage("Profile of " + name + " deleted");
-            database.deleteProfile(name);
         } else {
             canvas.showMessage("A profile with the name " + name + " does not exist");
         }
