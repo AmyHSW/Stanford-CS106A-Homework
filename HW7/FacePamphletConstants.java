@@ -34,6 +34,12 @@ public interface FacePamphletConstants {
 
     public static final double STATUS_MARGIN = 20;
 
+    public static final String COMMAND_ADD = "Add";
+
+    public static final String COMMAND_DELETE = "Delete";
+
+    public static final String COMMAND_LOOKUP = "Lookup";
+
     public static final String COMMAND_CHANGE_STATUS = "Change Status";
 
     public static final String COMMAND_CHANGE_PICTURE = "Change Picture";

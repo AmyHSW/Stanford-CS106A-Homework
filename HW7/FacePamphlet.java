@@ -29,9 +29,9 @@ public class FacePamphlet extends Program
         nameText.addActionListener(this);
         add(nameText, NORTH);
 
-        add(new JButton("Add"), NORTH);
-        add(new JButton("Delete"), NORTH);
-        add(new JButton("Lookup"), NORTH);
+        add(new JButton(COMMAND_ADD), NORTH);
+        add(new JButton(COMMAND_DELETE), NORTH);
+        add(new JButton(COMMAND_LOOKUP), NORTH);
     }
 
     private void addWestInteractors() {
@@ -59,9 +59,9 @@ public class FacePamphlet extends Program
     public void actionPerformed(ActionEvent e) {
         String name = nameText.getText().trim();
         switch (e.getActionCommand()) {
-        case "Add": addProfile(name); break;
-        case "Delete": deleteProfile(name); break;
-        case "Lookup": lookupProfile(name); break;
+        case COMMAND_ADD: addProfile(name); break;
+        case COMMAND_DELETE: deleteProfile(name); break;
+        case COMMAND_LOOKUP: lookupProfile(name); break;
         case COMMAND_CHANGE_STATUS: changeStatus(statusText.getText()); break;
         case COMMAND_CHANGE_PICTURE: changePicture(pictureText.getText()); break;
         case COMMAND_ADD_FRIEND: addFriend(friendText.getText()); break;
