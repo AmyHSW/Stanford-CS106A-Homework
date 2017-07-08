@@ -4,36 +4,37 @@ import java.util.*;
 public class FacePamphletProfile implements FacePamphletConstants {
 
     public FacePamphletProfile(String name) {
-        profileName = name;
-        profileStatus = "";
-        profileImage = null;
+        this.name = name;
+        status = "";
+        image = null;
+        friendList = new ArrayList<String>();
     }
 
     public String getName() {
-        return profileName;
+        return name;
     }
 
     public GImage getImage() {
-        return profileImage;
+        return image;
     }
 
     public void setImage(GImage image) {
-        profileImage = image;
+        this.image = image;
     }
 
     public String getStatus() {
-        return profileStatus;
+        return status;
     }
 
     public void setStatus(String status) {
-        profileStatus = status;
+        this.status = status;
     }
 
     public boolean addFriend(String friend) {
-        if (!friendList.contains(friend) && !friend.equals(profileName)) {
-            return friendList.add(friend);
-        } else {
+        if (friendList.contains(friend) || friend.equals(name)) {
             return false;
+        } else {
+            return friendList.add(friend);
         }
     }
 
@@ -46,7 +47,7 @@ public class FacePamphletProfile implements FacePamphletConstants {
     }
 
     public String toString() {
-        String str = profileName + " (" + profileStatus + "): ";
+        String str = name + " (" + status + "): ";
         if (friendList.size() > 0) str += friendList.get(0);
         for (int i = 1; i < friendList.size(); i++) {
             str += ", " + friendList.get(i);
@@ -54,8 +55,8 @@ public class FacePamphletProfile implements FacePamphletConstants {
         return str;
     }
 
-    private String profileName;
-    private String profileStatus;
-    private GImage profileImage;
-    private ArrayList<String> friendList = new ArrayList<String>();
+    private final String name;
+    private String status;
+    private GImage image;
+    private ArrayList<String> friendList;
 }
