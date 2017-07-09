@@ -5,24 +5,22 @@ import java.util.*;
 public class FacePamphletCanvas extends GCanvas
                     implements FacePamphletConstants {
 
-    public FacePamphletCanvas() {
-
-    }
-
-    public void showMessage(String msg) {
-        if (lastMsg != null) remove(lastMsg);
-        lastMsg = new GLabel(msg);
-        lastMsg.setFont(MESSAGE_FONT);
-        double x = (getWidth() - lastMsg.getWidth()) / 2.0;
-        double y = getHeight() - BOTTOM_MESSAGE_MARGIN;
-        lastMsg.setLocation(x, y);
-        add(lastMsg);
-    }
-
-    public void displayProfile(FacePamphletProfile profile) {
+    public void refresh(FacePamphletProfile profile, String msg) {
         removeAll();
-        if (lastMsg != null) add(lastMsg);
+        displayProfile(profile);
+        showMessage(msg);
+    }
 
+    private void showMessage(String msg) {
+        if (msg == null) return;
+        GLabel msgLabel = new GLabel(msg);
+        msgLabel.setFont(MESSAGE_FONT);
+        double x = (getWidth() - msgLabel.getWidth()) / 2.0;
+        double y = getHeight() - BOTTOM_MESSAGE_MARGIN;
+        add(msgLabel, x, y);
+    }
+
+    private void displayProfile(FacePamphletProfile profile) {
         if (profile == null) return;
 
         GLabel name = new GLabel(profile.getName());
@@ -74,6 +72,4 @@ public class FacePamphletCanvas extends GCanvas
             return image;
         }
     }
-
-    private GLabel lastMsg;
 }

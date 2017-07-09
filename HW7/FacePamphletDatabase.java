@@ -14,15 +14,14 @@ public class FacePamphletDatabase implements FacePamphletConstants {
         return map.get(name);
     }
 
-    public boolean deleteProfile(String name) {
-        if (!map.containsKey(name)) return false;
+    public void deleteProfile(String name) {
+        if (!map.containsKey(name)) return;
         Iterator<String> it = map.get(name).getFriends();
         while (it.hasNext()) {
             FacePamphletProfile friend = map.get(it.next());
             friend.removeFriend(name);
         }
         map.remove(name);
-        return true;
     }
 
     public boolean containsProfile(String name) {
