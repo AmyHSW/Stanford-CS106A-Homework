@@ -7,12 +7,12 @@ public class NameSurferEntry implements NameSurferConstants {
         rank = new int[NDECADES];
         int rankStart;
         int rankEnd = nameEnd;
-        for (int i = 0; i < NDECADES - 1; i++) {
+        for (int i = 0; i < NDECADES; i++) {
             rankStart = rankEnd + 1;
             rankEnd = line.indexOf(" ", rankStart);
+            if (rankEnd == -1) rankEnd = line.length();
             rank[i] = Integer.parseInt(line.substring(rankStart, rankEnd));
         }
-        rank[NDECADES - 1] = Integer.parseInt(line.substring(rankEnd + 1));
     }
 
     public String getName() {
@@ -32,7 +32,7 @@ public class NameSurferEntry implements NameSurferConstants {
         return str;
     }
 
-    private String name;
+    private final String name;
     private int[] rank;
 }
 

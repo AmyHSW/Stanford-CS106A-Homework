@@ -1,3 +1,5 @@
+import java.awt.*;
+
 public interface NameSurferConstants {
 
     public static final int APPLICATION_WIDTH = 800;
@@ -15,4 +17,8 @@ public interface NameSurferConstants {
     public static final int GRAPH_MARGIN_SIZE = 20;
 
     public static final int NAME_LENGTH = 20;
+
+    public static final Color[] COLORS = {
+        Color.BLACK, Color.RED, Color.BLUE, Color.MAGENTA
+    };
 }

@@ -10,37 +10,41 @@ public class NameSurfer extends Program implements NameSurferConstants {
 
     public void init() {
         database = new NameSurferDataBase(NAMES_DATA_FILE);
+
         graph = new NameSurferGraph();
         add(graph);
 
-        name = new JTextField(NAME_LENGTH);
-        name.setActionCommand("Graph");
+        addInteractors();
+    }
 
-        JButton graphButton = new JButton("Graph");
-        JButton clearButton = new JButton("Clear");
-
+    private void addInteractors() {
         add(new JLabel("Name "), SOUTH);
-        add(name, SOUTH);
-        add(graphButton, SOUTH);
-        add(clearButton, SOUTH);
 
+        nameField = new JTextField(NAME_LENGTH);
+        nameField.setActionCommand("Graph");
+        nameField.addActionListener(this);
+        add(nameField, SOUTH);
+
+        add(new JButton("Graph"), SOUTH);
+        add(new JButton("Clear"), SOUTH);
         addActionListeners();
-        name.addActionListener(this);
     }
 
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("Graph")) {
-            NameSurferEntry entry = database.findEntry(name.getText());
-            if (entry != null) {
-                graph.addEntry(entry);
-            }
-        }
-        if (e.getActionCommand().equals("Clear")) {
+        String cmd = e.getActionCommand();
+        if (cmd.equals("Graph")) {
+            String name = nameField.getText().trim();
+            if (name.length() == 0) return;
+            NameSurferEntry entry = database.findEntry(name);
+            if (entry == null) return;
+            graph.addEntry(entry);
+        } else if (cmd.equals("Clear")) {
             graph.clear();
         }
+        graph.update();
     }
 
-    private JTextField name;
     private NameSurferDataBase database;
     private NameSurferGraph graph;
+    private JTextField nameField;
 }
