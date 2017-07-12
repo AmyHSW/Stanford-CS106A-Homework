@@ -5,13 +5,14 @@ import java.util.*;
 public class HangmanLexicon {
 
     private static final String LONG_LEXICON = "HangmanLexicon.txt";
-    private static final String SHORT_LEXICON = "ShortLexicon.txt";
+    private static final String SHORT_LEXICON = "ShorterLexicon.txt";
+
+    private final ArrayList<String> wordList;
 
     public HangmanLexicon() {
         wordList = new ArrayList<String>();
         try {
-            BufferedReader rd
-                = new BufferedReader(new FileReader(LONG_LEXICON));
+            BufferedReader rd = new BufferedReader(new FileReader(LONG_LEXICON));
             while (true) {
                 String word = rd.readLine();
                 if (word == null) break;
@@ -28,8 +29,7 @@ public class HangmanLexicon {
     }
 
     public String getWord(int index) {
+        if (index < 0 || index >= wordList.size()) return null;
         return wordList.get(index);
     }
-
-    private final ArrayList<String> wordList;
 }
